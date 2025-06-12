@@ -72,7 +72,7 @@ The system ensures durability and backup of all incoming events by persisting th
 
 ### Events
 - `POST /events` — Ingest a new `page_view` event (JSON body)
-![img.png](static/events.png)
+![img.png](static/events_api_flow.png)
 ### Analytics
 - `GET /analytics/page_views_per_minute` — Page view counts per minute (last 5 minutes)
 - `GET /analytics/minute-buckets/{minute_key}` — Count for a specific minute bucket
