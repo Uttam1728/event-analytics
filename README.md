@@ -61,7 +61,7 @@ The system ensures durability and backup of all incoming events by persisting th
 
 ### Persistent Log Flow
 
-![img.png](static/persist.png)
+![img.png](static/persistent.png)
 
 ---
 
