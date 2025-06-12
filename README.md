@@ -16,12 +16,13 @@ This project includes a `docker-compose.yml` for easy setup. **Redis** is includ
 
 #### Steps
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/Uttam1728/event-analytics
 cd event-analytics
 docker-compose up --build
 ```
 - The API will be available at: [http://localhost:8000](http://localhost:8000)
 - Redis will be available at: `localhost:6379`
+- **API Testing:** Import the provided `event-analytics.postman_collection.json` into [Postman](https://www.postman.com/) to try all endpoints with example requests and responses.
 
 ### 2. Local Development (Without Docker)
 
@@ -63,6 +64,8 @@ uvicorn main:app --reload
 ### Persistent Events
 - `GET /persistent/status` — Status and statistics of persistent event processor
 
+- See the included `event-analytics.postman_collection.json` for ready-to-use API requests and example payloads.
+
 ---
 
 ## 🧪 Development & Testing
@@ -70,7 +73,8 @@ uvicorn main:app --reload
 - All dependencies are listed in `requirements.txt`.
 - Main entry point: `main.py`
 - Routers: `app/routers/`
-- To run tests or load tests, see `load_test.py` (if provided).
+- **API Testing:** Use the included Postman collection (`event-analytics.postman_collection.json`) for quick endpoint validation.
+- **Load Testing:** Use `load_test.py` to simulate high event throughput and test system performance. See the script for usage instructions and options.
 
 ---
 

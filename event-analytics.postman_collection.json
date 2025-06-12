@@ -1,0 +1,116 @@
+{
+  "info": {
+    "_postman_id": "event-analytics-collection-001",
+    "name": "Event Analytics API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Event Analytics API"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["health", ""]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "{\n  \"status\": \"healthy\",\n  \"timestamp\": \"2024-06-07T12:34:56.789Z\",\n  \"service\": \"event-analytics\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Ingest Page View Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"event_id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"user_id\": \"user_1\",\n  \"timestamp\": \"2024-06-07T12:34:56Z\",\n  \"event_type\": \"page_view\",\n  \"payload\": {\n    \"page_url\": \"https://example.com/page-1\"\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/events",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["events"]
+        }
+      },
+      "response": [
+        {
+          "code": 201,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Page view event accepted and queued for processing\",\n  \"event_id\": \"123e4567-e89b-12d3-a456-426614174000\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Page Views Per Minute (Last 5 Minutes)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/analytics/page_views_per_minute",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["analytics", "page_views_per_minute"]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "[\n  {\n    \"minute_timestamp\": \"2024-06-07T12:34:00Z\",\n    \"count\": 42\n  },\n  {\n    \"minute_timestamp\": \"2024-06-07T12:35:00Z\",\n    \"count\": 37\n  }\n]"
+        }
+      ]
+    },
+    {
+      "name": "Minute Bucket Count",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/analytics/minute-buckets/page_view_2024-06-07_12:34",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["analytics", "minute-buckets", "page_view_2024-06-07_12:34"]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "{\n  \"page_view_2024-06-07_12:34\": 42\n}"
+        }
+      ]
+    },
+    {
+      "name": "Persistent Event Processor Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/persistent/status",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["persistent", "status"]
+        }
+      },
+      "response": [
+        {
+          "code": 200,
+          "body": "{\n  \"status\": \"healthy\",\n  \"stats\": {\n    \"stream_length\": 100,\n    \"pending_messages\": 0,\n    \"files_count\": 10,\n    \"files_size_mb\": 1.23,\n    \"is_processor_running\": true\n  },\n  \"timestamp\": \"2024-06-07T12:34:56.789Z\"\n}"
+        }
+      ]
+    }
+  ]
+} 
