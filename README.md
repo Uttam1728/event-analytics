@@ -49,6 +49,22 @@ uvicorn main:app --reload
 
 ---
 
+## 🗄️ Persistent Event Logs
+
+The system ensures durability and backup of all incoming events by persisting them to disk in addition to real-time analytics in Redis. This is handled by a background processor that reads events from a Redis Stream and writes them in batches to partitioned JSONL files under the `persistent_events/` directory.
+
+### How it Works
+- **Event Ingestion:** Each event is first queued in a Redis Stream for ultra-fast, non-blocking ingestion.
+- **Background Processing:** A background worker fetches batches of events from the stream.
+- **File Storage:** Events are written to disk as JSONL files, partitioned by date and hour (e.g., `persistent_events/2024/06/07/events_2024-06-07-12.jsonl`).
+- **Durability:** This approach ensures that even if Redis is cleared or crashes, a durable backup of all events is available for recovery or further processing.
+
+### Persistent Log Flow
+
+![img_1.png](img_1.png)
+
+---
+
 ## 📚 API Endpoints
 
 ### Health

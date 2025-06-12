@@ -3,13 +3,14 @@ from typing import List, Dict, Optional, Any
 from datetime import datetime, timedelta
 from app.services.redis_client import redis_client
 from app.services.event_service import EventService
+from app.models.common import PageViewsPerMinuteResponse, PageViewsPerMinuteEntry, MinuteBucketResponse
 import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
-@router.get("/page_views_per_minute")
-async def get_page_views_per_minute() -> List[Dict[str, Any]]:
+@router.get("/page_views_per_minute", response_model=PageViewsPerMinuteResponse)
+async def get_page_views_per_minute() -> PageViewsPerMinuteResponse:
     """
     Retrieve page view counts per minute for the last 5 minutes.
     
@@ -35,15 +36,12 @@ async def get_page_views_per_minute() -> List[Dict[str, Any]]:
             # Format timestamp as ISO string representing start of minute
             minute_timestamp = current_time.strftime("%Y-%m-%dT%H:%M:%SZ")
             
-            result.append({
-                "minute_timestamp": minute_timestamp,
-                "count": count
-            })
+            result.append(PageViewsPerMinuteEntry(minute_timestamp=minute_timestamp, count=count))
             
             current_time += timedelta(minutes=1)
         
         logger.info(f"Retrieved page views per minute for last 5 minutes: {len(result)} entries")
-        return result
+        return PageViewsPerMinuteResponse(__root__=result)
         
     except HTTPException:
         raise
@@ -54,8 +52,8 @@ async def get_page_views_per_minute() -> List[Dict[str, Any]]:
             detail="Failed to retrieve analytics data"
         )
 
-@router.get("/minute-buckets/{minute_key}")
-async def get_minute_bucket(minute_key: str) -> Dict[str, int]:
+@router.get("/minute-buckets/{minute_key}", response_model=MinuteBucketResponse)
+async def get_minute_bucket(minute_key: str) -> MinuteBucketResponse:
     """
     Get count for a specific minute bucket.
     
@@ -70,7 +68,7 @@ async def get_minute_bucket(minute_key: str) -> Dict[str, int]:
         count = await redis_client.get_minute_bucket_count(minute_key)
         
         logger.info(f"Retrieved count {count} for bucket {minute_key}")
-        return {minute_key: count}
+        return MinuteBucketResponse(bucket_key=minute_key, count=count)
         
     except Exception as e:
         logger.error(f"Error retrieving minute bucket {minute_key}: {e}")

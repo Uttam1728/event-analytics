@@ -2,13 +2,14 @@ from fastapi import APIRouter, HTTPException, status, Query
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from app.services.stream_persistent_event_service import stream_persistent_event_service
+from app.models.common import PersistentEventStatusResponse, PersistentEventFilesResponse, PersistentEventFileInfo
 import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/persistent", tags=["persistent"])
 
-@router.get("/status")
-async def get_persistant_event_status() -> Dict[str, Any]:
+@router.get("/status", response_model=PersistentEventStatusResponse)
+async def get_persistant_event_status() -> PersistentEventStatusResponse:
     """
     Get current  status and statistics.
     
@@ -17,11 +18,11 @@ async def get_persistant_event_status() -> Dict[str, Any]:
     """
     try:
         stats = await stream_persistent_event_service.get_stats()
-        return {
-            "status": "healthy" if stats.get("is_processor_running") else "stopped",
-            "stats": stats,
-            "timestamp": datetime.now().isoformat()
-        }
+        return PersistentEventStatusResponse(
+            status="healthy" if stats.get("is_processor_running") else "stopped",
+            stats=stats,
+            timestamp=datetime.now().isoformat()
+        )
     except Exception as e:
         logger.error(f"Error getting  status: {e}")
         raise HTTPException(
@@ -29,6 +30,8 @@ async def get_persistant_event_status() -> Dict[str, Any]:
             detail="Failed to retrieve status"
         )
 
+@router.get("/files", response_model=PersistentEventFilesResponse)
+async def list_persistent_event_files() -> PersistentEventFilesResponse:
     """
     List all files with their metadata.
     
@@ -40,7 +43,7 @@ async def get_persistant_event_status() -> Dict[str, Any]:
         dir = Path(stream_persistent_event_service.PERSISTENT_DIR)
         
         if not dir.exists():
-            return {"files": [], "total_files": 0, "total_size_mb": 0}
+            return PersistentEventFilesResponse(files=[], total_files=0, total_size_mb=0)
         
         files_info = []
         total_size = 0
@@ -57,21 +60,21 @@ async def get_persistant_event_status() -> Dict[str, Any]:
             except Exception:
                 line_count = -1  # Error reading file
             
-            files_info.append({
-                "path": str(file_path.relative_to(dir)),
-                "size_mb": round(stat.st_size / (1024 * 1024), 2),
-                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                "event_count": line_count
-            })
+            files_info.append(PersistentEventFileInfo(
+                path=str(file_path.relative_to(dir)),
+                size_mb=round(stat.st_size / (1024 * 1024), 2),
+                modified=datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                event_count=line_count
+            ))
         
         # Sort by path
-        files_info.sort(key=lambda x: x["path"])
+        files_info.sort(key=lambda x: x.path)
         
-        return {
-            "files": files_info,
-            "total_files": len(files_info),
-            "total_size_mb": round(total_size / (1024 * 1024), 2)
-        }
+        return PersistentEventFilesResponse(
+            files=files_info,
+            total_files=len(files_info),
+            total_size_mb=round(total_size / (1024 * 1024), 2)
+        )
         
     except Exception as e:
         logger.error(f"Error listing  files: {e}")
