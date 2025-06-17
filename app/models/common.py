@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 
 class HealthResponse(BaseModel):
@@ -27,8 +27,8 @@ class PageViewsPerMinuteEntry(BaseModel):
     minute_timestamp: str
     count: int
 
-class PageViewsPerMinuteResponse(BaseModel):
-    __root__: list[PageViewsPerMinuteEntry]
+class PageViewsPerMinuteResponse(RootModel[list[PageViewsPerMinuteEntry]]):
+    pass
 
 class MinuteBucketResponse(BaseModel):
     bucket_key: str
