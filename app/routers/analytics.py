@@ -41,7 +41,7 @@ async def get_page_views_per_minute() -> PageViewsPerMinuteResponse:
             current_time += timedelta(minutes=1)
         
         logger.info(f"Retrieved page views per minute for last 5 minutes: {len(result)} entries")
-        return PageViewsPerMinuteResponse(__root__=result)
+        return PageViewsPerMinuteResponse(page_views_per_minute=result)
         
     except HTTPException:
         raise
