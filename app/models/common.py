@@ -26,6 +26,7 @@ class PersistentEventFilesResponse(BaseModel):
 class PageViewsPerMinuteEntry(BaseModel):
     minute_timestamp: str
     count: int
+    user_ids: list
 
 class PageViewsPerMinuteResponse(BaseModel):
     page_views_per_minute: list[PageViewsPerMinuteEntry]

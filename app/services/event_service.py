@@ -55,11 +55,13 @@ class EventService:
 
             # Update minute bucket count in Redis (non-blocking for fast response)
             try:
-                count = await redis_client.increment_minute_bucket(minute_key)
+                count = await redis_client.increment_minute_bucket(minute_key, event.user_id)
                 logger.info(f"Updated minute bucket {minute_key} to count: {count}")
             except Exception as redis_error:
                 logger.warning(f"Failed to update minute bucket: {redis_error}. Event still processed.")
                 # Don't fail the entire request if Redis operation fails
+
+
 
             # Queue event for (ultra-fast stream write)
             try:

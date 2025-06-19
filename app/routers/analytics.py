@@ -32,11 +32,11 @@ async def get_page_views_per_minute() -> PageViewsPerMinuteResponse:
         while current_time <= end_dt:
             minute_key = EventService.get_minute_bucket_key(current_time)
             count = await redis_client.get_minute_bucket_count(minute_key)
-            
+            user_ids = await redis_client.get_minute_bucket_users(minute_key)
             # Format timestamp as ISO string representing start of minute
             minute_timestamp = current_time.strftime("%Y-%m-%dT%H:%M:%SZ")
             
-            result.append(PageViewsPerMinuteEntry(minute_timestamp=minute_timestamp, count=count))
+            result.append(PageViewsPerMinuteEntry(minute_timestamp=minute_timestamp, count=count, user_ids=user_ids))
             
             current_time += timedelta(minutes=1)
         
